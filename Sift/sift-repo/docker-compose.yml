@@ -1,0 +1,23 @@
+services:
+  api:
+    build: ./api
+    ports: ["8000:8000"]
+    environment:
+      FETCH_URL: http://fetcher:9000
+      FETCH_SECRET: "${FETCH_SECRET:-sift-local-dev-secret-change-me-0000}"
+      DB_PATH: /data/sift.db
+    volumes: ["sift-data:/data", "./web:/app/web:ro"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [fetcher]
+  fetcher:           
+    build: ./fetcher
+    environment:
+      FETCH_SECRET: "${FETCH_SECRET:-sift-local-dev-secret-change-me-0000}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  sift-data:
